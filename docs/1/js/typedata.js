@@ -8,6 +8,7 @@ class TypeData {
             this._get = (v,k,t)=>v
             this._set = (v,k,t)=>t[k]=v
         }
+        else if (1===args.length && Type.isStr(args[0])) { this.#name = args[0] }
         else if (1===args.length && Type.isObj(args[0])) {
             'name,nullable,mutable,get,set'.split(',').map(k=>this[k] = args[0][k])
         }
@@ -18,11 +19,14 @@ class TypeData {
     }
     get name() { return this._name }
     set #name(v) {
-        if (this.isNullable)
-        this._name = this.#getName(v)
-        const base = this.#baseName(name)
+//        if (this.isNullable)
+        //this._name = this.#getName(v)
+        this._name = this.#getName(v.slice(0, Math.min(v.indexOf('<'), v.indexOf('?'), v.length)-1))
+        console.log(this._name)
+        const base = this.#baseName(v)
         'name,nullable,mutable'.split(',').map(k=>this[`_${k}`]=base[k])
         if (base.generics) { this._generics = this.#getGenerics(base).generics;  }
+        console.log(base)
     }
     get nullable() {return this._name.includes('?')}
     get mutable() {return this._name.includes('=')}
@@ -35,13 +39,19 @@ class TypeData {
         const nullable = this.#isNullable(n)
         const mutable = this.#isMutable(n)
         const g = this.#isGenericable(n) ? n.splice(n.indexOf('<'), n.lastIndexOf('>')) : ''
+        console.log(`g:${g}`)
         //n = this.#isGenericable(n) ? n.splice(0, n.indexOf('<')) : n
         n = g ? n.splice(0, n.indexOf('<')) : n
         n = nullable ? n.replace(/\?/g,'') : n
         n = mutable ? n.replace(/=/g,'') : n
-        return {name:n, nullable:nullable, mutable:mutable,
-            generics:this.isGenericable(name) ? name.splice(name.findIndex('<')) : ''} 
+        return {name:n, nullable:nullable, mutable:mutable, generics:this.baseName(g)} 
+            //generics:this.#isGenericable(name) ? name.splice(name.findIndex('<')) : ''} 
     }
+    // generics:
+    //   null
+    //   ['String','Integer']
+    //   [{name:'String', generics:{}/[]/null},'Integer']
+    //   {name:'String', generics:{}/[]/null}
     #getGenerics(base) { // <...>  <Int>  <Int,Str>  <Ary<Int>>  <Ary<Ary<Str>>>  <Ary<Ary<Int,Str>>>  <Map<Str,Cls<MyCls>>>
         const n = base.name.splice(base.name.indexOf('<'), base.name.lastIndexOf('>'))
         if (this.#isGenericable(n)) {return {...base, generics:this.#getGenerics(this.baseName(n))} }
@@ -65,7 +75,7 @@ class TypeData {
     }
     #getName(name) { // 大文字小文字を無視して存在確認する
         const N = name.toLowerCase()
-        for (let [k,v] of this._names.entries()) {
+        for (let [k,v] of Type._names.entries()) {
             if (k.toLowerCase()===N) {return k}
             const [abbrs,fn] = v
             if (abbrs.some(a=>a.toLowerCase()===N)) {return k}

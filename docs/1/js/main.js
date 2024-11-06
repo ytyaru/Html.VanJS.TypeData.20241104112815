@@ -12,6 +12,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const a = new Assertion();
     const bb = new BlackBox(a);
     a.t(!!TypeData)
+    console.log(new TypeData('String?='))
+    ;(function(){
+        const td = new TypeData('String?=')
+        console.log(td.name)
+        console.log(td.nullable)
+        console.log(td.mutable)
+        a.t('String'===td.name)
+        a.t(true===td.nullable)
+        a.t(true===td.mutable)
+    })();
 });
 window.addEventListener('beforeunload', (event) => {
     console.log('beforeunload!!');
