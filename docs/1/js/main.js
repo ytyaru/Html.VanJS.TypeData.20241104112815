@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const bb = new BlackBox(a);
     a.t(!!TypeData)
     console.log(new TypeData('String?='))
+    // 1
     ;(function(){
         const td = new TypeData('String?=')
         console.log(td.name)
@@ -22,6 +23,37 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(true===td.nullable)
         a.t(true===td.mutable)
     })();
+    ;(function(){
+        const td = new TypeData('String?')
+        console.log(td.name)
+        console.log(td.nullable)
+        console.log(td.mutable)
+        a.t('String'===td.name)
+        a.t(true===td.nullable)
+        a.t(false===td.mutable)
+    })();
+    ;(function(){
+        const td = new TypeData('String=')
+        console.log(td.name)
+        console.log(td.nullable)
+        console.log(td.mutable)
+        a.t('String'===td.name)
+        a.t(false===td.nullable)
+        a.t(true===td.mutable)
+    })();
+    // 2
+    ;(function(){
+        const td = new TypeData('Integer,String')
+        console.log(td)
+        console.log(td.name)
+        console.log(td.nullable)
+        console.log(td.mutable)
+        a.t('String'===td.name)
+        a.t(false===td.nullable)
+        a.t(true===td.mutable)
+    })();
+
+    a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
     console.log('beforeunload!!');

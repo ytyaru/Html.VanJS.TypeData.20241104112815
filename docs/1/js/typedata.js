@@ -9,6 +9,8 @@ class TypeData {
             this._set = (v,k,t)=>t[k]=v
         }
         else if (1===args.length && Type.isStr(args[0])) { this.#name = args[0] }
+        else {throw new TypeError(`引数は型を表す文字列であるべきです。`)}
+        /*
         else if (1===args.length && Type.isObj(args[0])) {
             'name,nullable,mutable,get,set'.split(',').map(k=>this[k] = args[0][k])
         }
@@ -16,9 +18,11 @@ class TypeData {
             const keys = 'name,nullable,mutable,get,set'.split(',');
             [...args].map((a,i)=>this[keys[i]]=a);
         }
+        */
     }
     get name() { return this._name }
     set #name(v) {
+        /*
 //        if (this.isNullable)
         //this._name = this.#getName(v)
         this._name = this.#getName(v.slice(0, Math.min(v.indexOf('<'), v.indexOf('?'), v.length)-1))
@@ -27,10 +31,19 @@ class TypeData {
         'name,nullable,mutable'.split(',').map(k=>this[`_${k}`]=base[k])
         if (base.generics) { this._generics = this.#getGenerics(base).generics;  }
         console.log(base)
+        */
+        const o = this.#read(v)
+        console.log(o)
+        this._name = o.name
+        this._nullable = o.nullable
+        this._mutable = o.mutable
+        this._generics = o.generics
     }
-    get nullable() {return this._name.includes('?')}
-    get mutable() {return this._name.includes('=')}
-    get genericable() {return this._name.includes('<') && this._name.includes('>')}
+    get nullable() {return this._nullable}
+    get mutable() {return this._mutable}
+//    get nullable() {return this._name.includes('?')}
+//    get mutable() {return this._name.includes('=')}
+//    get genericable() {return this._name.includes('<') && this._name.includes('>')}
     #isNullable(n) {return n.endsWith('?') || n.endsWith('?=')}
     #isMutable(n) {return n.endsWith('=') || n.endsWith('?=')}
     #isGenericable(n) {return n.includes('<') && n.includes('>')}
@@ -39,59 +52,71 @@ class TypeData {
         const idx = {
             comma: s.indexOf(','),
             less: s.indexOf('<'),
-            great: s.lastIndexOf('>'),
+            greatF: s.indexOf('>'),
+            greatL: s.lastIndexOf('>'),
         }
-        if (0<=idx.less && 0<=idx.great && idx.great < idx.less) {throw new TypeError(`ジェネリクスの記号順が不正です。'<>'であるべき所が'><'になっています。`)}
-        if ((0<=idx.less && -1===idx.great) || (-1===idx.less && 0<=idx.great)) {throw new TypeError(`ジェネリクスの記号が不足しています。'<>'であるべき所が'<'か'>'の片方しかありません。`)}
+        const num = {
+            less: (s.match(/</g) || []).length,
+            great: (s.match(/>/g) || []).length,
+        }
+        if (0<=idx.less && 0<=idx.great && idx.greatL < idx.less) {throw new TypeError(`ジェネリクスの記号順が不正です。'<>'であるべき所が'><'になっています。`)}
+//        if ((0<=idx.less && -1===idx.great) || (-1===idx.less && 0<=idx.great)) {throw new TypeError(`ジェネリクスの記号が不足しています。'<>'であるべき所が'<'か'>'の片方しかありません。`)}
+        if (num.less !== num.great){throw new TypeError(`ジェネリクスの記号数が不正です。'<'と'>'は同数であるべきです。'<':${num.less} '>':${num.great}`)}
 
-        if (-1===idx.comma && -1===idx.less && -1===idx.great) { // int?=
+        if (-1===idx.comma && -1===idx.less && -1===idx.greatL) { // int?=
             //return {name:s, nullable:this.#isNullable(s), mutable:this.#isMutable(s), generics:null} 
-            const o = {name:s, nullable:this.#isNullable(s), mutable:this.#isMutable(s), generics:null} 
+            //const o = {name:s, nullable:this.#isNullable(s), mutable:this.#isMutable(s), generics:null} 
+            const o = this.#makeTypeObj(s, null)
             if (Type.isAry(l)) {l.push(o)}
             return l ? l : o
         }
-        else if (-1===idx.comma && 0<=idx.less && 0<=idx.great) { // ary?=<int?=>   ary?=<ary?=<int?=>>
+        else if (-1===idx.comma && 0<=idx.less && 0<=idx.greatL) { // ary?=<int?=>   ary?=<ary?=<int?=>>
             const base = s.slice(0, s.indexOf(idx.less))
-            const gen = s.slice(s.indexOf(idx.less), s.indexOf(idx.great))
+            const gen = s.slice(idx.less, idx.greatL)
 //            return {name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:this.#read(gen)} 
-            const o = {name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:this.#read(gen)} 
+            //const o = {name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:this.#read(gen)} 
+            const o = this.#makeTypeObj(base, this.#read(gen))
             if (Type.isAry(l)) {l.push(o)}
             return l ? l : o
         }
-        else if (0<=idx.comma && -1===idx.less && -1===idx.great) { // int?=,str?=
-            return s.split(',').map(t=>this.#read(t.trim()))
+        else if (0<=idx.comma && -1===idx.less && -1===idx.greatL) { // int?=,str?=
+            //return s.split(',').map(t=>this.#read(t.trim()))
+            const a = s.split(',').map(t=>this.#read(t.trim()))
+            return Type.isAry(l) ? l.concat(a) : a
         }
-        else if (0<=idx.comma && 0<=idx.less && 0<=idx.great) { kvs?=<int?=,str?=>  kvs?=<int?=,ary?=<str?=>>  ary?=<str?=>,int?=
+        else if (0<=idx.comma && 0<=idx.less && 0<=idx.greatL) {//kvs?=<int?=,str?=>  kvs?=<int?=,ary?=<str?=>>  ary?=<str?=>,int?=
             if (idx.comma < idx.less) { // int?=,kvs<str?=,int?=>
                 const datas = []
                 const name = s.slice(0,idx.comma)
-                datas.push({name:name, nullable:this.#isNullable(name), mutable:this.#isMutable(name), generics:null})
+//                datas.push({name:name, nullable:this.#isNullable(name), mutable:this.#isMutable(name), generics:null})
+                datas.push(this.#makeTypeObj(name, null))
                 return this.#read(s.slice(idx.comma), datas)
             } else if (idx.less < idx.comma) { // kvs<str?=,int?=>  ary<int>,str  kvs<str?=,int?=>,str?=
                 const base = s.slice(0, idx.less)
                 const t = s.slice(idx.less)
-                if (','===s.slice(idx.great, idx.great + 1) { // 同位配列  ary<int>,str
+                const great = s.indexOf('>')
+                //if (','===s.slice(idx.great, idx.great + 1) { // 同位配列  ary<int>,str
+                if (','===s.slice(idx.greatF, idx.greatF + 1)) { // 同位配列  ary<int>,str
                     const datas = []
                     const name = s.slice(0,idx.comma)
-                    datas.push({name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:t.slice(0,idx.great)})
-                    return this.#read(t.slice(idx.great+1), datas)
+//                    datas.push({name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:t.slice(0,idx.greatF)})
+                    datas.push(this.#makeTypeObj(base, t.slice(0,idx.greatF)))
+                    return this.#read(t.slice(idx.greatF+1), datas)
                 } else { // 下位配列 kvs<str?=,int?=>
-                    const o = {name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:this.#read(t.slice(0,idx.great))} 
+                    //const o = {name:base, nullable:this.#isNullable(base), mutable:this.#isMutable(base), generics:this.#read(t.slice(0,idx.greatF))} 
+                    const o = this.#makeTypeObj(base, this.#read(t.slice(0,idx.greatF)))
                     if (Type.isAry(l)) {l.push(o)}
                     return l ? l : o
                 }
-                if (t.includes('>,')) { // 同位配列? kvs<kvs<int?=,str?=>,kvs<str?=,int?=>>
-                    
-                } else {
-
-                }
-                if (t.endsWith('>'))
             }
         }
-        if (0<=idx.less && idx.less < idx.comma) { // ary<int>,str
-            s.slice(0, s.indexOf(idx.less))
-        }
     }
+    #makeTypeObj(name, gen) { return {
+        name:name.replace('?','').replace('=',''), 
+        nullable:this.#isNullable(name), 
+        mutable:this.#isMutable(name), 
+        generics:gen} }
+
     #baseName(name) {
         let n = name
         const nullable = this.#isNullable(n)
