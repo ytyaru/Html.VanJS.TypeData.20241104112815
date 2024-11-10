@@ -144,6 +144,114 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(true===td.generics[0].generics.mutable)
         a.t(null===td.generics[0].generics.generics)
     })();
+    ;(function(){ // Generics三重後方ネスト
+        const td = TypeData.read('Kvs?=<String?=,Kvs?=<String?=,Array?=<Integer?=>>>')
+        a.t(Type.isObj(td))
+        console.log(td)
+        a.t('Kvs'===td.name)
+        a.t(true===td.nullable)
+        a.t(true===td.mutable)
+        a.t(Type.isAry(td.generics))
+        a.t(2===td.generics.length)
+
+        a.t('String'===td.generics[0].name)
+        a.t(true===td.generics[0].nullable)
+        a.t(true===td.generics[0].mutable)
+        a.t(null===td.generics[0].generics)
+
+        a.t('Kvs'===td.generics[1].name)
+        a.t(true===td.generics[1].nullable)
+        a.t(true===td.generics[1].mutable)
+        a.t(Type.isAry(td.generics[1].generics))
+        a.t(2===td.generics[1].generics.length)
+
+        a.t('String'===td.generics[1].generics[0].name)
+        a.t(true===td.generics[1].generics[0].nullable)
+        a.t(true===td.generics[1].generics[0].mutable)
+        a.t(null===td.generics[1].generics[0].generics)
+
+        a.t('Array'===td.generics[1].generics[1].name)
+        a.t(true===td.generics[1].generics[1].nullable)
+        a.t(true===td.generics[1].generics[1].mutable)
+        a.t(Type.isObj(td.generics[1].generics[1].generics))
+
+        a.t('Integer'===td.generics[1].generics[1].generics.name)
+        a.t(true===td.generics[1].generics[1].generics.nullable)
+        a.t(true===td.generics[1].generics[1].generics.mutable)
+        a.t(null===td.generics[1].generics[1].generics.generics)
+    })();
+    ;(function(){ // Generics三重前方ネスト
+        const td = TypeData.read('Kvs?=<Kvs?=<Array?=<Integer?=>,String?=>,String?=>')
+        a.t(Type.isObj(td))
+        console.log(td)
+        a.t('Kvs'===td.name)
+        a.t(true===td.nullable)
+        a.t(true===td.mutable)
+        a.t(Type.isAry(td.generics))
+        a.t(2===td.generics.length)
+
+        a.t('String'===td.generics[1].name)
+        a.t(true===td.generics[1].nullable)
+        a.t(true===td.generics[1].mutable)
+        a.t(null===td.generics[1].generics)
+
+        a.t('Kvs'===td.generics[0].name)
+        a.t(true===td.generics[0].nullable)
+        a.t(true===td.generics[0].mutable)
+        a.t(Type.isAry(td.generics[0].generics))
+        a.t(2===td.generics[0].generics.length)
+
+        a.t('String'===td.generics[0].generics[1].name)
+        a.t(true===td.generics[0].generics[1].nullable)
+        a.t(true===td.generics[0].generics[1].mutable)
+        a.t(null===td.generics[0].generics[1].generics)
+
+        a.t('Array'===td.generics[0].generics[0].name)
+        a.t(true===td.generics[0].generics[0].nullable)
+        a.t(true===td.generics[0].generics[0].mutable)
+        a.t(Type.isObj(td.generics[0].generics[0].generics))
+
+        a.t('Integer'===td.generics[0].generics[0].generics.name)
+        a.t(true===td.generics[0].generics[0].generics.nullable)
+        a.t(true===td.generics[0].generics[0].generics.mutable)
+        a.t(null===td.generics[0].generics[0].generics.generics)
+    })();
+    ;(function(){ // Generics三重中間ネスト
+        const td = TypeData.read('Kvs?=<Kvs?=<String?=,Array?=<Integer?=>>,String?=>')
+        a.t(Type.isObj(td))
+        console.log(td)
+        a.t('Kvs'===td.name)
+        a.t(true===td.nullable)
+        a.t(true===td.mutable)
+        a.t(Type.isAry(td.generics))
+        a.t(2===td.generics.length)
+
+        a.t('String'===td.generics[1].name)
+        a.t(true===td.generics[1].nullable)
+        a.t(true===td.generics[1].mutable)
+        a.t(null===td.generics[1].generics)
+
+        a.t('Kvs'===td.generics[0].name)
+        a.t(true===td.generics[0].nullable)
+        a.t(true===td.generics[0].mutable)
+        a.t(Type.isAry(td.generics[0].generics))
+        a.t(2===td.generics[0].generics.length)
+
+        a.t('String'===td.generics[0].generics[0].name)
+        a.t(true===td.generics[0].generics[0].nullable)
+        a.t(true===td.generics[0].generics[0].mutable)
+        a.t(null===td.generics[0].generics[0].generics)
+
+        a.t('Array'===td.generics[0].generics[1].name)
+        a.t(true===td.generics[0].generics[1].nullable)
+        a.t(true===td.generics[0].generics[1].mutable)
+        a.t(Type.isObj(td.generics[0].generics[1].generics))
+
+        a.t('Integer'===td.generics[0].generics[1].generics.name)
+        a.t(true===td.generics[0].generics[1].generics.nullable)
+        a.t(true===td.generics[0].generics[1].generics.mutable)
+        a.t(null===td.generics[0].generics[1].generics.generics)
+    })();
     // 1 短縮
     ;(function(){
         const td = TypeData.read('int')
@@ -249,7 +357,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(false===td[1].mutable)
         a.t(null===td[1].generics)
     })();
-    ;(function(){ // ,のほうが<より先 ネスト(後方)
+    ;(function(){ // ,のほうが<より先 後方ネスト
         const td = TypeData.read('String,Kvs<String,Array<Integer>>')
         a.t(Type.isAry(td))
         a.t(2===td.length)
@@ -282,7 +390,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(false===td[1].generics[1].generics.mutable)
         a.t(null===td[1].generics[1].generics.generics)
     })();
-    ;(function(){ // ,のほうが<より先 ネスト(前方)
+    ;(function(){ // ,のほうが<より先 前方ネスト
         const td = TypeData.read('String,Kvs<Array<Integer>,String>')
         a.t(Type.isAry(td))
         a.t(2===td.length)
