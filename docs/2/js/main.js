@@ -492,7 +492,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(null===td[1].generics)
     })();
 
-
     // 3
     ;(function(){
         const td = TypeData.read('Integer?=,String?=,Date?=')
@@ -515,6 +514,79 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(true===td[2].mutable)
         a.t(null===td[2].generics)
     })();
+    ;(function(){
+        //const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>,Map<String,Integer>>,Array<Integer>,Map<String?=,Date?=>')
+        //const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>>,Map<String,Integer>,Array<Integer>,Map<String?=,Date?=>')
+        const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>>,Map<String,Integer>,Array<Integer>,Map<String?=,Date?=>')
+
+
+        a.t(Type.isAry(td))
+        a.t(3===td.length)
+        console.log(td)
+        a.t('Kvs'===td[0].name)
+        a.t(false===td[0].nullable)
+        a.t(false===td[0].mutable)
+        a.t(Type.isAry(td[0].generics))
+        a.t(2===td[0].generics.length)
+
+        a.t('Kvs'===td[0].generics[0].name)
+        a.t(false===td[0].generics[0].nullable)
+        a.t(false===td[0].generics[0].mutable)
+        a.t(Type.isAry(td[0].generics[0].generics))
+        a.t(2===td[0].generics[0].generics.length)
+
+        a.t('Array'===td[0].generics[0].generics[0].name)
+        a.t(false===td[0].generics[0].generics[0].nullable)
+        a.t(false===td[0].generics[0].generics[0].mutable)
+        a.t(Type.isObj(td[0].generics[0].generics[0].generics))
+
+        a.t('Integer'===td[0].generics[0].generics[0].generics.name)
+        a.t(false===td[0].generics[0].generics[0].generics.nullable)
+        a.t(false===td[0].generics[0].generics[0].generics.mutable)
+        a.t(null===td[0].generics[0].generics[0].generics.generics)
+
+        a.t('Array'===td[0].generics[0].generics[1].name)
+        a.t(false===td[0].generics[0].generics[1].nullable)
+        a.t(false===td[0].generics[0].generics[1].mutable)
+        a.t(Type.isObj(td[0].generics[0].generics[1].generics))
+
+        a.t('String'===td[0].generics[0].generics[1].generics.name)
+        a.t(false===td[0].generics[0].generics[1].generics.nullable)
+        a.t(false===td[0].generics[0].generics[1].generics.mutable)
+        a.t(null===td[0].generics[0].generics[1].generics.generics)
+
+
+
+        a.t('Kvs'===td[0].generics[1].name)
+        a.t(false===td[0].generics[1].nullable)
+        a.t(false===td[0].generics[1].mutable)
+        a.t(Type.isAry(td[0].generics[1].generics))
+        a.t(2===td[0].generics[1].generics.length)
+
+        a.t('Cls'===td[0].generics[1].generics[0].name)
+        a.t(false===td[0].generics[1].generics[0].nullable)
+        a.t(false===td[0].generics[1].generics[0].mutable)
+        a.t(Type.isObj(td[0].generics[1].generics[0].generics))
+
+        a.t('Some'===td[0].generics[1].generics[0].generics.name)
+        a.t(false===td[0].generics[1].generics[0].generics.nullable)
+        a.t(false===td[0].generics[1].generics[0].generics.mutable)
+        a.t(null===td[0].generics[1].generics[0].generics.generics)
+
+        a.t('Ins'===td[0].generics[1].generics[1].name)
+        a.t(false===td[0].generics[1].generics[1].nullable)
+        a.t(false===td[0].generics[1].generics[1].mutable)
+        a.t(Type.isObj(td[0].generics[1].generics[1].generics))
+
+        a.t('Any'===td[0].generics[1].generics[1].generics.name)
+        a.t(false===td[0].generics[1].generics[1].generics.nullable)
+        a.t(false===td[0].generics[1].generics[1].generics.mutable)
+        a.t(null===td[0].generics[1].generics[1].generics.generics)
+
+
+
+    })();
+
 
 
     a.fin()
