@@ -43,10 +43,29 @@ class TypeData {
             return Type.isAry(l) ? l.concat(a) : a
         }
         else if (0<=idx.comma && 0<=idx.less && 0<=idx.greatE) {//kvs?=<int?=,str?=>  kvs?=<int?=,ary?=<str?=>>  ary?=<str?=>,int?=
-            const commaE = this.#sameLevelCommaIndex(s)
-            if (-1===commaE) { // 下位カンマあり
-
-            } 
+//            const commaE = this.#sameLevelCommaIndex(s)
+//            if (-1===commaE) { // 下位カンマあり
+//            } 
+            const end = idx.comma < idx.less ? idx.comma : idx.less
+            const name = s.slice(0, end)
+            const t = s.slice(end)
+            // ,が<より先（先頭項目は配列要素）
+            // <が,より先（先頭項目はジェネリクスの親）
+            if (idx.comma < idx.less) {
+                const o = this.#makeTypeObj(name, null)
+                if (Type.isAry(l)) {l.push(o)}
+                return this.read(t.slice(1), Type.isAry(l) ? l : [o])
+            } else { // idx.less < idx.comma
+                console.log(s.slice(idx.less+1, idx.greatE))
+                const o = this.#makeTypeObj(name, this.read(s.slice(idx.less+1, idx.greatE)))
+                if (Type.isAry(l)) {l.push(o)}
+                if (idx.greatE!==s.length-1){
+                    //if (','===s.slice(idx.greatE+1,idx.greatE+2)) {return this.read(t.slice(idx.greatE+2),Type.isAry(l) ? l : [o])}
+                    if (','===s.slice(idx.greatE+1,idx.greatE+2)) {return this.read(s.slice(idx.greatE+2),Type.isAry(l) ? l : [o])}
+                    else {throw new TypeError(`>の直後は,のみ有効です。>もありえますが再帰処理されるはずです。`)}
+                } else {return Type.isAry(l) ? l : o}
+            }
+            /*
             const name = s.slice(0, idx.less)
             const genS = s.slice(idx.less+1, idx.greatE)
             console.log(name)
@@ -62,6 +81,7 @@ class TypeData {
                 } else {throw new TypeError(`>の後には,のみ有効です。: ${s}`)}
 //                } else if ('>'===s.charAt(idx.greatE+1)) {
             }
+            */
         }
         /*
         else if (0<=idx.comma && 0<=idx.less && 0<=idx.greatE) {//kvs?=<int?=,str?=>  kvs?=<int?=,ary?=<str?=>>  ary?=<str?=>,int?=

@@ -517,7 +517,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     ;(function(){
         //const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>,Map<String,Integer>>,Array<Integer>,Map<String?=,Date?=>')
         //const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>>,Map<String,Integer>,Array<Integer>,Map<String?=,Date?=>')
-        const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>>,Map<String,Integer>,Array<Integer>,Map<String?=,Date?=>')
+        const td = TypeData.read('Kvs<Kvs<Array<Integer>,Array<String>>,Kvs<Cls<Some>,Ins<Any>>>,Map<String,Integer>,Array<Integer>')
 
 
         a.t(Type.isAry(td))
@@ -555,8 +555,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(false===td[0].generics[0].generics[1].generics.mutable)
         a.t(null===td[0].generics[0].generics[1].generics.generics)
 
-
-
         a.t('Kvs'===td[0].generics[1].name)
         a.t(false===td[0].generics[1].nullable)
         a.t(false===td[0].generics[1].mutable)
@@ -583,12 +581,34 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(false===td[0].generics[1].generics[1].generics.mutable)
         a.t(null===td[0].generics[1].generics[1].generics.generics)
 
+        // 2
+        a.t('Map'===td[1].name)
+        a.t(false===td[1].nullable)
+        a.t(false===td[1].mutable)
+        a.t(Type.isAry(td[1].generics))
+        a.t(2===td[1].generics.length)
 
+        a.t('String'===td[1].generics[0].name)
+        a.t(false===td[1].generics[0].nullable)
+        a.t(false===td[1].generics[0].mutable)
+        a.t(null===td[1].generics[0].generics)
 
+        a.t('Integer'===td[1].generics[1].name)
+        a.t(false===td[1].generics[1].nullable)
+        a.t(false===td[1].generics[1].mutable)
+        a.t(null===td[1].generics[1].generics)
+
+        // 3
+        a.t('Array'===td[2].name)
+        a.t(false===td[2].nullable)
+        a.t(false===td[2].mutable)
+        a.t(Type.isObj(td[2].generics))
+
+        a.t('Integer'===td[2].generics.name)
+        a.t(false===td[2].generics.nullable)
+        a.t(false===td[2].generics.mutable)
+        a.t(null===td[2].generics.generics)
     })();
-
-
-
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
