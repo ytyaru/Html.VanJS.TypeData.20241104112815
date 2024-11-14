@@ -635,10 +635,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.e(TypeError, `'y'は不正な型名です。`, ()=>TypeData.read('ary<y>'))
     })();
     ;(function(){
-        a.e(TypeError, `'int'はジェネリクスを持てません。`, ()=>TypeData.read('int<str>'))
+        a.e(TypeError, `'int'型はジェネリクスを持てません。`, ()=>TypeData.read('int<str>'))
+        a.e(TypeError, `'Object'型にジェネリクス指定するときはキーと値に対する2つのジェネリクス型を持ちます:obj<K,V>`, ()=>TypeData.read('obj<str,int>'))
 //        a.e(TypeError, `'y'は不正な型名です。`, ()=>TypeData.read('num<int>'))
 //        a.e(TypeError, `'y'は不正な型名です。`, ()=>TypeData.read('num<flt>'))
     })();
+    ;(function(){
+        // TypeData.validValue('ary<int>', [0,'A']) // 値の型がintではありません。
+    })();
+
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
